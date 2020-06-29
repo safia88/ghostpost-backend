@@ -7,6 +7,7 @@ Ghost: Boasts, Roasts
 """
 import random
 import string
+from django.utils.crypto import get_random_string
 from django.db import models
 
 
@@ -15,15 +16,17 @@ class Post(models.Model):
     content = models.CharField(max_length=280)
     up_votes = models.IntegerField(default=0)
     down_votes = models.IntegerField(default=0)
-    total_votes = models.IntegerField(default=0)
     submit_time = models.DateTimeField(auto_now_add=True, blank=True)
-    secret_key = models.CharField(max_length=6)
+    total_votes = models.IntegerField(default=0)
+    secret_key = models.CharField(
+        max_length=6,
+        blank=True,
+        default=get_random_string(6).lower(),
+        editable=False
+    )
 
-    @property
+    def __str__(self):
+        return self.content
+
     def total_votes(self):
         return self.up_votes - self.down_votes
-
-    @property
-    def secret_key(self):
-        letters = string.ascii_lowercase
-        return ''.join(random.choice(letters) for i in range(6))
